@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  home:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID}
+        USER: ${USER}
+        GID: ${GID}
+        GROUP: ${GROUP}
+    command: tail -f /dev/null
+    volumes:
+      - ${HOME}:${HOME}
+      - /var/run/docker.sock:/var/run/docker.sock
