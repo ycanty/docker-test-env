@@ -16,14 +16,16 @@ ARG GROUP=1000
 RUN grep -q "${GROUP}:" /etc/group && groupdel ${GROUP}; \
     if [ "$(getent group ${GID} | cut -d: -f 1)" != "" ]; then groupdel "$(getent group ${GID} | cut -d: -f 1)"; fi; \
     groupadd -g ${GID} ${GROUP} && \
-    useradd -b /Users -m -g ${GID} -G sudo,docker -s /bin/bash -u ${UID} ${USER} && \
+    useradd -b /Users -m -g ${GID} -s /bin/bash -u ${UID} ${USER} && \
     echo "${USER}:system" | chpasswd
 
 # sudo without a password
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-# To avoid permission denied accessing MacOS host's docker socket
-RUN echo "test -S /var/run/docker.sock && sudo chown ${UID}:${GID} /var/run/docker.sock" >> /Users/${USER}/.bashrc
+# To avoid permission denied accessing MacOS host's docker socket, we could do this, however this
+# changes the permissions inside the hyperkit VM if it's mounted from /var/run/docker.sock.raw and it's
+# best to avoid messing with the docker VM
+#RUN echo "test -S /var/run/docker.sock && sudo chown ${UID}:${GID} /var/run/docker.sock" >> /Users/${USER}/.bashrc
 
 WORKDIR /Users/${USER}
 USER ${USER}

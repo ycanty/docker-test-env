@@ -10,6 +10,12 @@ services:
         GID: ${GID}
         GROUP: ${GROUP}
     command: tail -f /dev/null
+    user: ${UID}:${GID}
+    # To support docker-in-docker: mount docker.sock.raw and give user same group as that socket has in the hyperkit VM
+    # See: https://github.com/docker/for-mac/issues/4755#issuecomment-726351209f
+    group_add:
+      - root
+      - sudo
     volumes:
       - ${HOME}:${HOME}
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock.raw:/var/run/docker.sock
